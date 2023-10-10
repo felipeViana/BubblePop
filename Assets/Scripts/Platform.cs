@@ -4,25 +4,33 @@ using UnityEngine;
 
 public class Platform : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    [SerializeField] private float rotateDuration = 1.0f;
+    private bool rotating = false;
 
     private void OnMouseUpAsButton()
     {
-        Debug.Log(this.name);
-        
-        // rotate platform
-        var currentRotation = transform.eulerAngles;
+        StartCoroutine(rotateObject(this.gameObject, new Vector3(0, 60, 0), rotateDuration));
+    }
 
-        transform.rotation = Quaternion.Euler(new Vector3(currentRotation.x, currentRotation.y + 60f, currentRotation.z));
+    private IEnumerator rotateObject(GameObject gameObjectToMove, Vector3 eulerAngles, float duration)
+    {
+        if (rotating)
+        {
+            yield break;
+        }
+        rotating = true;
+
+        Vector3 newRot = gameObjectToMove.transform.eulerAngles + eulerAngles;
+
+        Vector3 currentRot = gameObjectToMove.transform.eulerAngles;
+
+        float counter = 0;
+        while (counter < duration)
+        {
+            counter += Time.deltaTime;
+            gameObjectToMove.transform.eulerAngles = Vector3.Lerp(currentRot, newRot, counter / duration);
+            yield return null;
+        }
+        rotating = false;
     }
 }
