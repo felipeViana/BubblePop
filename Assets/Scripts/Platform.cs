@@ -6,7 +6,7 @@ using UnityEngine;
 public class Platform : MonoBehaviour
 {
     // don't change the order of these positions!
-    // same order as spawnPositions
+    // same order as spawnPositions defined in prefab
     private enum platformPositions
     {
         DownLeft,
@@ -116,8 +116,6 @@ public class Platform : MonoBehaviour
 
         string color1 = Bubble1.GetComponent<Bubble>().GetColor();
         string color2 = Bubble2.GetComponent<Bubble>().GetColor();
-
-        Debug.Log(color1 + ", " + color2);
 
         if (color1 == color2)
         {
