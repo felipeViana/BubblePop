@@ -6,25 +6,27 @@ public class GameController : MonoBehaviour
 {
     [SerializeField] private GameObject[] Bubbles;
 
-    // Start is called before the first frame update
     void Start()
     {
-        GameObject PlatformTop = GameObject.Find("PlatformTop");
-        for (int i = 0; i < 6; i++)
+        GameObject[] Platforms = new GameObject[] 
         {
-            // spawn at position i
-            GameObject BubblePosition = PlatformTop.transform.GetChild(i).gameObject;
-            Vector3 position = BubblePosition.transform.position;
+            GameObject.Find("PlatformTop"),
+            GameObject.Find("PlatformLeft"),
+            GameObject.Find("PlatformRight"),
+            GameObject.Find("PlatformDown")
+        };
 
-            GameObject newBubble = Instantiate(Bubbles[i], position, Quaternion.identity);
-            newBubble.transform.parent = PlatformTop.transform;
-        }
-        
-    }
+        foreach (GameObject platform in Platforms)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                // spawn at position i
+                GameObject Bubble = platform.transform.GetChild(i).gameObject;
+                Vector3 position = Bubble.transform.position;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+                GameObject newBubble = Instantiate(Bubbles[i], position, Quaternion.identity);
+                newBubble.transform.parent = Bubble.transform;
+            }
+        }   
     }
 }
