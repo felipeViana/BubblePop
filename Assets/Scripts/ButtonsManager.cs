@@ -9,4 +9,9 @@ public class ButtonsManager : MonoBehaviour
         GameController.Instance.RestartLevel();
     }
 
+    public void OnContinueButtonPressed()
+    {
+        GameController.Instance.AdvanceLevel();
+    }
+
 }

@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using TMPro;
 
 public class GameController : MonoBehaviour
 {
@@ -10,9 +12,19 @@ public class GameController : MonoBehaviour
     [SerializeField] private GameObject FailText;
     [SerializeField] private GameObject RestartButton;
 
+    [SerializeField] private GameObject WinText;
+    [SerializeField] private GameObject ContinueButton;
+
+    [SerializeField] private GameObject LevelText;
+
+    private int levelNumber = 1;
+
+    private List<GameObject> bubblesInPlay = new List<GameObject>(24);
+
     public static GameController Instance { get; private set; }
 
     private bool failed = false;
+    private bool won = false;
 
     public bool GetFailed()
     {
@@ -22,22 +34,23 @@ public class GameController : MonoBehaviour
     {
         failed = newValue;
 
-        if (failed)
-        {
-            FailText.SetActive(true);
-            RestartButton.SetActive(true);
-        }
-        else
-        {
-            FailText.SetActive(false);
-            RestartButton?.SetActive(false);
-        }
+        FailText.SetActive(newValue);
+        RestartButton.SetActive(newValue);
+    }
+
+    private void SetWon(bool newValue) 
+    {
+        won = newValue;
+
+        WinText.SetActive(newValue);
+        ContinueButton.SetActive(newValue);
     }
 
     void Start()
     {
         Instance = this;
         SetFailed(false);
+        SetWon(false);
         GenerateLevel();
     }
 
@@ -52,6 +65,8 @@ public class GameController : MonoBehaviour
 
                 GameObject newBubble = Instantiate(Bubbles[i], position, Quaternion.identity);
                 newBubble.transform.parent = SpawnPosition.transform;
+
+                bubblesInPlay.Add(newBubble);
             }
         }
     }
@@ -59,9 +74,38 @@ public class GameController : MonoBehaviour
     public void RestartLevel()
     {
         SetFailed(false);
+        SetWon(false);
         DestroyAllBubbles();
         ResetRotations();
         GenerateLevel();
+    }
+
+    public void WinLevel()
+    {
+        SetWon(true);
+    }
+
+    public void AdvanceLevel()
+    {
+        levelNumber++;
+
+        LevelText.GetComponent<TMP_Text>().text = "Level: " + levelNumber.ToString();
+
+        RestartLevel();
+    }
+
+    public void DestroyBubbles(GameObject Bubble1, GameObject Bubble2)
+    {
+        Destroy(Bubble1);
+        Destroy(Bubble2);
+
+        bubblesInPlay.Remove(Bubble1);
+        bubblesInPlay.Remove(Bubble2);
+
+        if (bubblesInPlay.Count == 0)
+        {
+            WinLevel();
+        }
     }
 
     private void DestroyAllBubbles()
@@ -76,6 +120,7 @@ public class GameController : MonoBehaviour
                 {
                     GameObject bubble = SpawnPosition.transform.GetChild(j).gameObject;
                     Destroy(bubble);
+                    bubblesInPlay.Remove(bubble);
                 }
             }
 

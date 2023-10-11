@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -92,8 +93,7 @@ public class PlatformsManager : MonoBehaviour
 
         if (color1 == color2)
         {
-            Destroy(Bubble1);
-            Destroy(Bubble2);
+            GameController.Instance.DestroyBubbles(Bubble1 , Bubble2);
 
             if (shouldFail)
             {
