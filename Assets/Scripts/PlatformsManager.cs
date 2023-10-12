@@ -78,7 +78,7 @@ public class PlatformsManager : MonoBehaviour
         return offsettedPosition;
     }
 
-    private bool CheckColorMatch(GameObject SpawnPosition1, GameObject SpawnPosition2, bool shouldFail = false, bool onlyChecking = false)
+    private bool CheckColorMatch(GameObject SpawnPosition1, GameObject SpawnPosition2, bool shouldFail = false)
     {
         if (SpawnPosition1.transform.childCount == 0 || SpawnPosition2.transform.childCount == 0)
         {
@@ -93,11 +93,6 @@ public class PlatformsManager : MonoBehaviour
 
         if (color1 == color2)
         {
-            if (onlyChecking)
-            {
-                return true;
-            }
-
             GameController.Instance.DestroyBubbles(Bubble1 , Bubble2);
 
             if (shouldFail)
@@ -105,37 +100,6 @@ public class PlatformsManager : MonoBehaviour
                 GameController.Instance.SetFailed(true);
             }
         }
-
-        return false;
-    }
-
-    // check for matches before starting level
-    public bool CheckForImmediateMatches()
-    {
-        // compare top with left
-        GameObject SpawnTopLeft = PlatformTop.transform.GetChild((int)platformPositions.DownLeft).gameObject;
-        GameObject SpawnLeftUp = PlatformLeft.transform.GetChild((int)platformPositions.UpRight).gameObject;
-        if (CheckColorMatch(SpawnLeftUp, SpawnTopLeft, false, true)) return true;
-
-        // compare top with down
-        GameObject SpawnTopDown = PlatformTop.transform.GetChild((int)platformPositions.Down).gameObject;
-        GameObject SpawnDownUp = PlatformDown.transform.GetChild((int)platformPositions.Up).gameObject;
-        if (CheckColorMatch(SpawnDownUp, SpawnTopDown, false, true)) return true;
-
-        // compare top with right
-        GameObject SpawnTopRight = PlatformTop.transform.GetChild((int)platformPositions.DownRight).gameObject;
-        GameObject SpawnRightUp = PlatformRight.transform.GetChild((int)platformPositions.UpLeft).gameObject;
-        if (CheckColorMatch(SpawnRightUp, SpawnTopRight, false, true)) return true;
-
-        // compare down with left
-        GameObject SpawnDownLeft = PlatformDown.transform.GetChild((int)platformPositions.UpLeft).gameObject;
-        GameObject SpawnLeftDown = PlatformLeft.transform.GetChild((int)platformPositions.DownRight).gameObject;
-        if (CheckColorMatch(SpawnLeftDown, SpawnDownLeft, false, true)) return true;
-
-        // compare down with right
-        GameObject SpawnDownRight = PlatformDown.transform.GetChild((int)platformPositions.UpRight).gameObject;
-        GameObject SpawnRightDown = PlatformRight.transform.GetChild((int)platformPositions.DownLeft).gameObject;
-        if (CheckColorMatch(SpawnRightDown, SpawnDownRight, false, true)) return true;
 
         return false;
     }

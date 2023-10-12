@@ -50,6 +50,7 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
+        PlayerPrefs.DeleteAll();
         Instance = this;
         SetFailed(false);
         SetWon(false);
@@ -101,8 +102,6 @@ public class GameController : MonoBehaviour
                 bubblesInPlay.Add(newBubble);
             }
         }
-
-        //Debug.Log(PlatformsManager.Instance.CheckForImmediateMatches());
     }
 
     private List<int> GenerateIndexList()
@@ -125,28 +124,25 @@ public class GameController : MonoBehaviour
 
     private void GenerateLevel()
     {
-        do
+        bubblesAsString = "";
+        bubblesInPlay.Clear();
+
+        List<int> indexList = GenerateIndexList();
+        foreach (GameObject platform in Platforms)
         {
-            bubblesAsString = "";
-            bubblesInPlay.Clear();
 
-            foreach (GameObject platform in Platforms)
+            for (int i = 0; i < 6; i++)
             {
-                List<int> indexList = GenerateIndexList();
+                GameObject SpawnPosition = platform.transform.GetChild(i).gameObject;
+                Vector3 position = SpawnPosition.transform.position;
 
-                for (int i = 0; i < 6; i++)
-                {
-                    GameObject SpawnPosition = platform.transform.GetChild(i).gameObject;
-                    Vector3 position = SpawnPosition.transform.position;
+                GameObject newBubble = Instantiate(Bubbles[indexList.ElementAt(i)], position, Quaternion.identity);
+                newBubble.transform.parent = SpawnPosition.transform;
 
-                    GameObject newBubble = Instantiate(Bubbles[indexList.ElementAt(i)], position, Quaternion.identity);
-                    newBubble.transform.parent = SpawnPosition.transform;
-
-                    bubblesInPlay.Add(newBubble);
-                    bubblesAsString += indexList.ElementAt(i);
-                }
+                bubblesInPlay.Add(newBubble);
+                bubblesAsString += indexList.ElementAt(i);
             }
-        } while(PlatformsManager.Instance.CheckForImmediateMatches());
+        }
 
         SaveData();
     }
