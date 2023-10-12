@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using TMPro;
+using System;
 
 public class GameController : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private GameObject LevelText;
 
     private int levelNumber = 1;
+    private string bubblesAsString;
 
     private List<GameObject> bubblesInPlay = new List<GameObject>(24);
 
@@ -51,19 +53,73 @@ public class GameController : MonoBehaviour
         Instance = this;
         SetFailed(false);
         SetWon(false);
-        GenerateLevel();
+        LoadData();
+
+        if (PlayerPrefs.HasKey("LevelNumber"))
+        {
+            LoadLevel();
+        }
+        else
+        {
+            GenerateLevel();
+        }
     }
 
-    private void GenerateLevel()
+    private void DeleteData()
     {
-        foreach (GameObject platform in Platforms)
+        PlayerPrefs.DeleteAll();
+    }
+
+    private void LoadData()
+    {
+        if (PlayerPrefs.HasKey("LevelNumber"))
+        {
+            levelNumber = PlayerPrefs.GetInt("LevelNumber");
+            UpdateLevelText();
+
+            bubblesAsString = PlayerPrefs.GetString("Bubbles");
+        }
+    }
+
+    private void SaveData()
+    {
+        PlayerPrefs.SetInt("LevelNumber", levelNumber);
+        PlayerPrefs.SetString("Bubbles", bubblesAsString);
+    }
+
+    private void UpdateLevelText()
+    {
+        LevelText.GetComponent<TMP_Text>().text = "Level: " + levelNumber.ToString();
+    }
+
+    private List<int> GenerateIndexList()
+    {
+        var indexList = new List<int>();
+
+        for (int i = 0; i < 6; i++)
+        {
+            int randomIndex;
+            do
+            {
+                randomIndex = UnityEngine.Random.Range(0, 6);
+            } while (indexList.Contains(randomIndex));
+
+            indexList.Add(randomIndex);
+        }
+
+        return indexList;
+    }
+
+    private void LoadLevel()
+    {
+        for (int platformIndex = 0; platformIndex < Platforms.Length; platformIndex++)
         {
             for (int i = 0; i < 6; i++)
             {
-                GameObject SpawnPosition = platform.transform.GetChild(i).gameObject;
+                GameObject SpawnPosition = Platforms[platformIndex].transform.GetChild(i).gameObject;
                 Vector3 position = SpawnPosition.transform.position;
 
-                GameObject newBubble = Instantiate(Bubbles[i], position, Quaternion.identity);
+                GameObject newBubble = Instantiate(Bubbles[Int32.Parse(bubblesAsString.ElementAt(i + platformIndex * 6).ToString())], position, Quaternion.identity);
                 newBubble.transform.parent = SpawnPosition.transform;
 
                 bubblesInPlay.Add(newBubble);
@@ -71,13 +127,33 @@ public class GameController : MonoBehaviour
         }
     }
 
+    private void GenerateLevel()
+    {
+        bubblesAsString = "";
+        List<int> indexList = GenerateIndexList();
+
+        foreach (GameObject platform in Platforms)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                GameObject SpawnPosition = platform.transform.GetChild(i).gameObject;
+                Vector3 position = SpawnPosition.transform.position;
+
+                GameObject newBubble = Instantiate(Bubbles[indexList.ElementAt(i)], position, Quaternion.identity);
+                newBubble.transform.parent = SpawnPosition.transform;
+
+                bubblesInPlay.Add(newBubble);
+                bubblesAsString += indexList.ElementAt(i);
+            }
+        }
+
+        SaveData();
+    }
+
     public void RestartLevel()
     {
-        SetFailed(false);
-        SetWon(false);
-        DestroyAllBubbles();
-        ResetRotations();
-        GenerateLevel();
+        ResetConditions();
+        LoadLevel();
     }
 
     public void WinLevel()
@@ -85,13 +161,21 @@ public class GameController : MonoBehaviour
         SetWon(true);
     }
 
+    private void ResetConditions()
+    {
+        SetFailed(false);
+        SetWon(false);
+        DestroyAllBubbles();
+        ResetRotations();
+    }
+
     public void AdvanceLevel()
     {
         levelNumber++;
+        UpdateLevelText();
 
-        LevelText.GetComponent<TMP_Text>().text = "Level: " + levelNumber.ToString();
-
-        RestartLevel();
+        ResetConditions();
+        GenerateLevel();
     }
 
     public void DestroyBubbles(GameObject Bubble1, GameObject Bubble2)
@@ -125,6 +209,8 @@ public class GameController : MonoBehaviour
             }
 
         }
+
+        bubblesAsString = null;
     }
 
     private void ResetRotations()
