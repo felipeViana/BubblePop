@@ -89,6 +89,7 @@ public class GameController : MonoBehaviour
     }
     private void LoadLevel()
     {
+        bubblesAsString = PlayerPrefs.GetString("Bubbles");
         for (int platformIndex = 0; platformIndex < Platforms.Length; platformIndex++)
         {
             for (int i = 0; i < 6; i++)
