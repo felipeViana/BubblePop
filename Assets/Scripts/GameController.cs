@@ -86,6 +86,24 @@ public class GameController : MonoBehaviour
     {
         LevelText.GetComponent<TMP_Text>().text = "Level: " + levelNumber.ToString();
     }
+    private void LoadLevel()
+    {
+        for (int platformIndex = 0; platformIndex < Platforms.Length; platformIndex++)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                GameObject SpawnPosition = Platforms[platformIndex].transform.GetChild(i).gameObject;
+                Vector3 position = SpawnPosition.transform.position;
+
+                GameObject newBubble = Instantiate(Bubbles[Int32.Parse(bubblesAsString.ElementAt(i + platformIndex * 6).ToString())], position, Quaternion.identity);
+                newBubble.transform.parent = SpawnPosition.transform;
+
+                bubblesInPlay.Add(newBubble);
+            }
+        }
+
+        //Debug.Log(PlatformsManager.Instance.CheckForImmediateMatches());
+    }
 
     private List<int> GenerateIndexList()
     {
@@ -105,42 +123,30 @@ public class GameController : MonoBehaviour
         return indexList;
     }
 
-    private void LoadLevel()
-    {
-        for (int platformIndex = 0; platformIndex < Platforms.Length; platformIndex++)
-        {
-            for (int i = 0; i < 6; i++)
-            {
-                GameObject SpawnPosition = Platforms[platformIndex].transform.GetChild(i).gameObject;
-                Vector3 position = SpawnPosition.transform.position;
-
-                GameObject newBubble = Instantiate(Bubbles[Int32.Parse(bubblesAsString.ElementAt(i + platformIndex * 6).ToString())], position, Quaternion.identity);
-                newBubble.transform.parent = SpawnPosition.transform;
-
-                bubblesInPlay.Add(newBubble);
-            }
-        }
-    }
-
     private void GenerateLevel()
     {
-        bubblesAsString = "";
-        List<int> indexList = GenerateIndexList();
-
-        foreach (GameObject platform in Platforms)
+        do
         {
-            for (int i = 0; i < 6; i++)
+            bubblesAsString = "";
+            bubblesInPlay.Clear();
+
+            foreach (GameObject platform in Platforms)
             {
-                GameObject SpawnPosition = platform.transform.GetChild(i).gameObject;
-                Vector3 position = SpawnPosition.transform.position;
+                List<int> indexList = GenerateIndexList();
 
-                GameObject newBubble = Instantiate(Bubbles[indexList.ElementAt(i)], position, Quaternion.identity);
-                newBubble.transform.parent = SpawnPosition.transform;
+                for (int i = 0; i < 6; i++)
+                {
+                    GameObject SpawnPosition = platform.transform.GetChild(i).gameObject;
+                    Vector3 position = SpawnPosition.transform.position;
 
-                bubblesInPlay.Add(newBubble);
-                bubblesAsString += indexList.ElementAt(i);
+                    GameObject newBubble = Instantiate(Bubbles[indexList.ElementAt(i)], position, Quaternion.identity);
+                    newBubble.transform.parent = SpawnPosition.transform;
+
+                    bubblesInPlay.Add(newBubble);
+                    bubblesAsString += indexList.ElementAt(i);
+                }
             }
-        }
+        } while(PlatformsManager.Instance.CheckForImmediateMatches());
 
         SaveData();
     }
