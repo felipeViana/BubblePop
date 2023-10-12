@@ -6,6 +6,7 @@ public class Bubble : MonoBehaviour
 {
     [SerializeField] private string color;
     [SerializeField] private float timeToDie;
+    [SerializeField] private float growthScale;
 
     private bool dying = false;
     private float timeDying = 0;
@@ -15,7 +16,7 @@ public class Bubble : MonoBehaviour
         if (dying)
         {
             timeDying += Time.deltaTime;
-            gameObject.transform.localScale += Vector3.one * 0.00001f;
+            gameObject.transform.localScale += Vector3.one * growthScale;
 
             if (timeDying > timeToDie )
             {
