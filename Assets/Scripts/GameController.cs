@@ -50,7 +50,6 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
-        PlayerPrefs.DeleteAll();
         Instance = this;
         SetFailed(false);
         SetWon(false);
@@ -81,6 +80,7 @@ public class GameController : MonoBehaviour
     {
         PlayerPrefs.SetInt("LevelNumber", levelNumber);
         PlayerPrefs.SetString("Bubbles", bubblesAsString);
+        PlayerPrefs.Save();
     }
 
     private void UpdateLevelText()
