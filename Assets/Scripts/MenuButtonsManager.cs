@@ -14,5 +14,8 @@ public class MenuButtonsManager : MonoBehaviour
         Application.Quit();
     }
 
-    
+    public void OpenTutorial()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Tutorial");
+    }
 }

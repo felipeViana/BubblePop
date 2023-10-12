@@ -65,11 +65,6 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void DeleteData()
-    {
-        PlayerPrefs.DeleteAll();
-    }
-
     private void LoadData()
     {
         if (PlayerPrefs.HasKey("LevelNumber"))
@@ -180,8 +175,8 @@ public class GameController : MonoBehaviour
 
     public void DestroyBubbles(GameObject Bubble1, GameObject Bubble2)
     {
-        Destroy(Bubble1);
-        Destroy(Bubble2);
+        Bubble1.GetComponent<Bubble>().StartDying();
+        Bubble2.GetComponent<Bubble>().StartDying();
 
         bubblesInPlay.Remove(Bubble1);
         bubblesInPlay.Remove(Bubble2);
